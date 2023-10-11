@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="NetworkingTool.Views.PortScannerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkingTool.Views"
+             xmlns:validationrules="clr-namespace:NetworkingTool.Views.ValidationRules"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Name="lblCursorPosition" Text="Status:" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="{Binding CurrentScanStatus}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="2">
+                <CheckBox HorizontalAlignment="Center" Grid.Column="0" Content="Hide Closed" IsChecked="{Binding HideClosedPorts}" Margin="0, 5, 0, 0" />
+            </Grid>
+
+
+            <Grid Margin="10,5,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBox x:Name="ipInput" Grid.Row="0"
+                         Style="{StaticResource placeHolder}" 
+                         Tag="IP Address ex. 192.168.0.1, 192.168.0.2 | or range 192.168.0.1-255">
+                    <TextBox.Text>
+                        <Binding Path="IpsAndRanges" NotifyOnValidationError="True" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationrules:IpAddressesValidationRule ValidationStep="UpdatedValue"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBlock Grid.Row="1" Foreground="Red" Text="{Binding ElementName=ipInput,Path=(Validation.Errors)[0].ErrorContent}" />
+            </Grid>
+
+            <Grid Grid.Row="1"  Margin="10,0,10,0" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <TextBox x:Name="portInput" Grid.Row="0"  
+                         Style="{StaticResource placeHolder}" 
+                         Tag="Port Number ex. 80, 443 | or range 1-1024"  Margin="0,0,0,16" Grid.RowSpan="2">
+                    <TextBox.Text>
+                        <Binding Path="PortsAndRanges" NotifyOnValidationError="True" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <validationrules:PortsValidationRule ValidationStep="UpdatedValue"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+               
+                <TextBlock Grid.Row="1" Foreground="Red" Text="{Binding ElementName=portInput,Path=(Validation.Errors)[0].ErrorContent}" Grid.ColumnSpan="2" />
+            </Grid>
+
+
+            <Button Command="{Binding ScanCommand}" Grid.Row="2" Content="Run scan" Width="Auto" Margin="10,0,10,10" />
+
+            <DataGrid x:Name="ScanResultsDataGrid" IsReadOnly="True" ItemsSource="{Binding FilteredScanResults}" Grid.Row="3" Grid.ColumnSpan="2" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="IP Address" Binding="{Binding IpAddress}" Width="*"/>
+                    <DataGridTextColumn Header="Port" Binding="{Binding Port}" Width="*"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
+
+
+</UserControl>
